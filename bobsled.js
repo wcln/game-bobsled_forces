@@ -16,21 +16,15 @@ var gameStarted = false;
 var moving = false;
 
 // physics stuff
-var velocity_initial = 20; // sled initial velocity (Set by user)
-var VELOCITY_FINAL = 0; // final velocity is always zero
+var velocity_initial; // sled initial velocity (computed)
 var time = 0; // time variable (will be incremented)
-var acceleration = 0; // set by user
-var mass = 0; // set by user
-var force_push = 0; // set by user
-var force_friction;
-var mu_kinetic;
+var mass; // set by user
+var force_push; // set by user
+var mu_kinetic; // set by user
 var PUSHING_TIME = 5; // constant
 
-var start_time;
+var start_time; // computed
 var last_displacement = 0;
-
-// assumptions
-var PIXELS_PER_METRE = 10;
 
 
 function init() {
@@ -50,7 +44,7 @@ function init() {
 
 function update(event) {
  	if (gameStarted) {
-    
+
     // bobsled is moving
     if (moving) {
 
