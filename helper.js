@@ -14,11 +14,11 @@ function toggleMute() {
 	}
 
 	if (mute == true) {
-		stage.addChild(unmuteButton);
-		stage.removeChild(muteButton);
-	} else {
 		stage.addChild(muteButton);
 		stage.removeChild(unmuteButton);
+	} else {
+		stage.addChild(unmuteButton);
+		stage.removeChild(muteButton);
 	}
 }
 
