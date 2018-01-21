@@ -6,6 +6,7 @@
  */
 
 //// VARIABLES ////
+var canvas = document.getElementById("gameCanvas");
 
 var mute = false;
 var FPS = 20;
@@ -25,6 +26,9 @@ var PUSHING_TIME = 5; // constant
 
 var start_time; // computed
 var last_displacement = 0;
+
+// select boxes
+var pushSelect, massSelect, surfaceSelect, positionSelect;
 
 
 function init() {
@@ -65,6 +69,7 @@ function update(event) {
     }
   }
 
+  updateSelectPositions(); // maintain positions of select HTML elements when page is zoomed or canvas is moved
 	stage.update(event);
 }
 
@@ -81,10 +86,61 @@ function initGraphics() {
   bobsled.y = 345;
   stage.addChild(bobsled);
 
+  // OVERLAYED SELECT BOXES
 
+  // push select
+  var pushSelectHTML = document.createElement('select');
+  pushSelectHTML.id = "pushSelect";
+  pushSelectHTML.class = "overlayed";
+  var pushOptions = ["Small", "Medium", "Large"];
+  addOptionsToSelect(pushSelectHTML, pushOptions);
+  pushSelectHTML.style.position = "absolute";
+  pushSelectHTML.style.top = 0;
+  pushSelectHTML.style.left = 0;
+  document.body.appendChild(pushSelectHTML);
+  pushSelect = new createjs.DOMElement(pushSelectHTML);
 
+  // mass select
+  var massSelectHTML = document.createElement('select');
+  massSelectHTML.id = "massSelect";
+  massSelectHTML.class = "overlayed";
+  var massOptions = ["Small", "Medium", "Large"];
+  addOptionsToSelect(massSelectHTML, massOptions);
+  massSelectHTML.style.position = "absolute";
+  massSelectHTML.style.top = 0;
+  massSelectHTML.style.left = 0;
+  document.body.appendChild(massSelectHTML);
+  massSelect = new createjs.DOMElement(massSelectHTML);
 
+  // surface select
+  var surfaceSelectHTML = document.createElement('select');
+  surfaceSelectHTML.id = "surfaceSelect";
+  surfaceSelectHTML.class = "overlayed";
+  var surfaceOptions = ["Ice", "Snow", "Grass", "Gravel"];
+  addOptionsToSelect(surfaceSelectHTML, surfaceOptions);
+  surfaceSelectHTML.style.position = "absolute";
+  surfaceSelectHTML.style.top = 0;
+  surfaceSelectHTML.style.left = 0;
+  document.body.appendChild(surfaceSelectHTML);
+  surfaceSelect = new createjs.DOMElement(surfaceSelectHTML);
 
+  // position select
+  var positionSelectHTML = document.createElement('select');
+  positionSelectHTML.id = "positionSelect";
+  positionSelectHTML.class = "overlayed";
+  var positionOptions = ["Low", "Sit", "Stand"];
+  addOptionsToSelect(positionSelectHTML, positionOptions);
+  positionSelectHTML.style.position = "absolute";
+  positionSelectHTML.style.top = 0;
+  positionSelectHTML.style.left = 0;
+  document.body.appendChild(positionSelectHTML);
+  positionSelect = new createjs.DOMElement(positionSelectHTML);
+
+  updateSelectPositions();
+  stage.addChild(pushSelect);
+  stage.addChild(massSelect);
+  stage.addChild(surfaceSelect);
+  stage.addChild(positionSelect);
 
 	initListeners();
 
@@ -97,11 +153,40 @@ function initGraphics() {
 	stage.update();
 }
 
+/*
+ * Maintain positions of select HTML elements when page is zoomed or canvas is moved
+ */
+function updateSelectPositions() {
+  pushSelect.x = gameCanvas.getBoundingClientRect().left + 105;
+  pushSelect.y = gameCanvas.getBoundingClientRect().top + 520;
+
+  massSelect.x = gameCanvas.getBoundingClientRect().left + 355;
+  massSelect.y = gameCanvas.getBoundingClientRect().top + 520;
+
+  surfaceSelect.x = gameCanvas.getBoundingClientRect().left + 595;
+  surfaceSelect.y = gameCanvas.getBoundingClientRect().top + 520;
+
+  positionSelect.x = gameCanvas.getBoundingClientRect().left + 795;
+  positionSelect.y = gameCanvas.getBoundingClientRect().top + 520;
+}
+
 function initListeners() {
   // go button
   go_button.on("click", go);
 
   // reset button
+}
+
+/*
+ * Add option elements to a select element
+ */
+function addOptionsToSelect(select, options) {
+  for (var i = 0; i < options.length; i++) {
+    var option = document.createElement('option');
+    option.value = options[i];
+    option.text = options[i];
+    select.appendChild(option);
+  }
 }
 
 /*

@@ -14,23 +14,3 @@ canvas {
 	right: 0;
 	margin: auto;
 }
-
-/* HTML elements overlayed on top of game canvas */
-#overlayed {
-	position: absolute;
-	z-index: 1;
-	top: 600px;
-	left: 225px;
-	right: 225px;
-	bottom: 0;
-	width: 160px;
-	height: 25px;
-	margin: auto;
-	background-color: blue;
-	border: 2px solid black;
-	padding: 15px;
-}
-
-#overlayed #container {
-	float: right;
-}
