@@ -30,6 +30,28 @@ var last_displacement = 0;
 // select boxes
 var pushSelect, massSelect, surfaceSelect, positionSelect;
 
+// values for options
+var pushOptionValues = [];
+pushOptionValues['Small'] = 200;
+pushOptionValues['Medium'] = 350;
+pushOptionValues['Large'] = 445;
+
+var massOptionValues = [];
+massOptionValues['Small'] = 20;
+massOptionValues['Medium'] = 24;
+massOptionValues['Large'] = 27;
+
+var surfaceOptionValues = [];
+surfaceOptionValues['Ice'] = 0.02;
+surfaceOptionValues['Snow'] = 0.06;
+surfaceOptionValues['Grass'] = 0.08;
+surfaceOptionValues['Gravel'] = 0.10;
+
+var positionOptionValues = [];
+positionOptionValues['Low'] = 0.02;
+positionOptionValues['Sit'] = 0.04;
+positionOptionValues['Stand'] = 0.06;
+
 
 function init() {
  	STAGE_WIDTH = parseInt(document.getElementById("gameCanvas").getAttribute("width"));
@@ -136,7 +158,7 @@ function initGraphics() {
   document.body.appendChild(positionSelectHTML);
   positionSelect = new createjs.DOMElement(positionSelectHTML);
 
-  updateSelectPositions();
+  updateSelectPositions(); // position the select elements correctly
   stage.addChild(pushSelect);
   stage.addChild(massSelect);
   stage.addChild(surfaceSelect);
@@ -149,6 +171,8 @@ function initGraphics() {
   go_button.y = 200;
   stage.addChild(go_button);
 
+
+  // start the game
 	gameStarted = true;
 	stage.update();
 }
@@ -215,9 +239,10 @@ function initMuteUnMuteButtons() {
 function go() {
 
   // set physics variables
-  force_push = 500;
-  mass = 20;
-  mu_kinetic = 0.05; // add to this depending on position as well
+  force_push = pushOptionValues[pushSelect.htmlElement.value];
+  mass = massOptionValues[massSelect.htmlElement.value];
+  mu_kinetic = surfaceOptionValues[surfaceSelect.htmlElement.value] + positionOptionValues[positionSelect.htmlElement.value]; // for air drag just add onto the ground friction (for simplicity sake)
+
 
   // compute initial velocity
   velocity_initial = (force_push * PUSHING_TIME) / mass;
@@ -227,7 +252,7 @@ function go() {
   // remove the go button from the stage
   stage.removeChild(go_button);
 
-  moving = true;
+  moving = true; // update method will run movement code now
 }
 
 /*
