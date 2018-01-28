@@ -45,12 +45,15 @@ var surfaceOptionValues = [];
 surfaceOptionValues['Ice'] = 0.02;
 surfaceOptionValues['Snow'] = 0.06;
 surfaceOptionValues['Grass'] = 0.08;
-surfaceOptionValues['Gravel'] = 0.10;
+surfaceOptionValues['Asphalt'] = 0.10;
 
 var positionOptionValues = [];
 positionOptionValues['Low'] = 0.02;
 positionOptionValues['Sit'] = 0.04;
 positionOptionValues['Stand'] = 0.06;
+
+var currentBackground;
+
 
 
 function init() {
@@ -82,6 +85,7 @@ function update(event) {
 
       if (displacement - last_displacement < 0) {
         moving = false;
+        stage.addChild(reset_button);
       } else {
         // update sled x position
         bobsled.x += displacement - last_displacement;
@@ -119,6 +123,7 @@ function initGraphics() {
   pushSelectHTML.style.position = "absolute";
   pushSelectHTML.style.top = 0;
   pushSelectHTML.style.left = 0;
+  pushSelectHTML.style.width = "70px";
   document.body.appendChild(pushSelectHTML);
   pushSelect = new createjs.DOMElement(pushSelectHTML);
 
@@ -131,6 +136,7 @@ function initGraphics() {
   massSelectHTML.style.position = "absolute";
   massSelectHTML.style.top = 0;
   massSelectHTML.style.left = 0;
+  massSelectHTML.style.width = "70px";
   document.body.appendChild(massSelectHTML);
   massSelect = new createjs.DOMElement(massSelectHTML);
 
@@ -138,11 +144,13 @@ function initGraphics() {
   var surfaceSelectHTML = document.createElement('select');
   surfaceSelectHTML.id = "surfaceSelect";
   surfaceSelectHTML.class = "overlayed";
-  var surfaceOptions = ["Ice", "Snow", "Grass", "Gravel"];
+  var surfaceOptions = ["Ice", "Snow", "Grass", "Asphalt"];
   addOptionsToSelect(surfaceSelectHTML, surfaceOptions);
   surfaceSelectHTML.style.position = "absolute";
   surfaceSelectHTML.style.top = 0;
   surfaceSelectHTML.style.left = 0;
+  surfaceSelectHTML.style.width = "70px";
+  surfaceSelectHTML.onchange = updateSurface;
   document.body.appendChild(surfaceSelectHTML);
   surfaceSelect = new createjs.DOMElement(surfaceSelectHTML);
 
@@ -155,6 +163,7 @@ function initGraphics() {
   positionSelectHTML.style.position = "absolute";
   positionSelectHTML.style.top = 0;
   positionSelectHTML.style.left = 0;
+  positionSelectHTML.style.width = "70px";
   document.body.appendChild(positionSelectHTML);
   positionSelect = new createjs.DOMElement(positionSelectHTML);
 
@@ -171,6 +180,10 @@ function initGraphics() {
   go_button.y = 200;
   stage.addChild(go_button);
 
+  // reset button
+  reset_button.x = 400;
+  reset_button.y = 200;
+
 
   // start the game
 	gameStarted = true;
@@ -181,17 +194,17 @@ function initGraphics() {
  * Maintain positions of select HTML elements when page is zoomed or canvas is moved
  */
 function updateSelectPositions() {
-  pushSelect.x = gameCanvas.getBoundingClientRect().left + 105;
-  pushSelect.y = gameCanvas.getBoundingClientRect().top + 520;
+  pushSelect.x = gameCanvas.getBoundingClientRect().left + 65;
+  pushSelect.y = gameCanvas.getBoundingClientRect().top + 473;
 
-  massSelect.x = gameCanvas.getBoundingClientRect().left + 355;
-  massSelect.y = gameCanvas.getBoundingClientRect().top + 520;
+  massSelect.x = gameCanvas.getBoundingClientRect().left + 212;
+  massSelect.y = gameCanvas.getBoundingClientRect().top + 473;
 
-  surfaceSelect.x = gameCanvas.getBoundingClientRect().left + 595;
-  surfaceSelect.y = gameCanvas.getBoundingClientRect().top + 520;
+  surfaceSelect.x = gameCanvas.getBoundingClientRect().left + 359;
+  surfaceSelect.y = gameCanvas.getBoundingClientRect().top + 473;
 
-  positionSelect.x = gameCanvas.getBoundingClientRect().left + 795;
-  positionSelect.y = gameCanvas.getBoundingClientRect().top + 520;
+  positionSelect.x = gameCanvas.getBoundingClientRect().left + 506;
+  positionSelect.y = gameCanvas.getBoundingClientRect().top + 473;
 }
 
 function initListeners() {
@@ -199,6 +212,7 @@ function initListeners() {
   go_button.on("click", go);
 
   // reset button
+  reset_button.on("click", reset);
 }
 
 /*
@@ -233,6 +247,12 @@ function initMuteUnMuteButtons() {
 	stage.addChild(unmuteButton);
 }
 
+function updateSurface() {
+  stage.addChildAt(backgrounds[surfaceSelect.htmlElement.value]);
+  stage.removeChild(currentBackground);
+  currentBackground = backgrounds[surfaceSelect.htmlElement.value];
+}
+
 /*
  * Launch the bobsled!
  */
@@ -252,6 +272,8 @@ function go() {
   // remove the go button from the stage
   stage.removeChild(go_button);
 
+  last_displacement = 0;
+
   moving = true; // update method will run movement code now
 }
 
@@ -259,9 +281,18 @@ function go() {
  * Reset the bobsled for another push
  */
 function reset() {
+  // ensure that moving is set to false (should be anyways)
   moving = false;
 
+  // remove reset button from Stage
+  stage.removeChild(reset_button);
+
+  // reset bobsled position
+  bobsled.x = 10;
+  bobsled.y = 345;
+
   // add the go button to the stage
+  stage.addChild(go_button);
 }
 
 
@@ -271,7 +302,10 @@ function reset() {
 var muteButton, unmuteButton;
 var background;
 var bobsled;
-var go_button;
+var go_button, reset_button;
+var overlay;
+var backgrounds = [];
+
 
 function setupManifest() {
  	manifest = [
@@ -284,8 +318,24 @@ function setupManifest() {
       id: "unmute"
     },
     {
-      src: "images/background.png",
-      id: "background"
+      src: "images/interface.png",
+      id: "overlay"
+    },
+    {
+      src: "images/asphalt.png",
+      id: "asphalt"
+    },
+    {
+      src: "images/ice.png",
+      id: "ice"
+    },
+    {
+      src: "images/grass.png",
+      id: "grass"
+    },
+    {
+      src: "images/snow.png",
+      id: "snow"
     },
     {
       src: "images/bobsled.png",
@@ -294,6 +344,10 @@ function setupManifest() {
     {
       src: "images/go_button.png",
       id: "go_button"
+    },
+    {
+      src: "images/reset_button.png",
+      id: "reset_button"
     }
  	];
 }
@@ -316,12 +370,22 @@ function handleFileLoad(event) {
     muteButton = new createjs.Bitmap(event.result);
   } else if (event.item.id == "unmute") {
     unmuteButton = new createjs.Bitmap(event.result);
-  } else if (event.item.id == "background") {
-    background = new createjs.Bitmap(event.result);
   } else if (event.item.id == "bobsled") {
     bobsled = new createjs.Bitmap(event.result);
   } else if (event.item.id == "go_button") {
     go_button = new createjs.Bitmap(event.result);
+  } else if (event.item.id == "reset_button") {
+    reset_button = new createjs.Bitmap(event.result);
+  } else if (event.item.id == "overlay") {
+    overlay = new createjs.Bitmap(event.result);
+  } else if (event.item.id == "asphalt") {
+    backgrounds['Asphalt'] = new createjs.Bitmap(event.result);
+  } else if (event.item.id == "ice") {
+    backgrounds['Ice'] = new createjs.Bitmap(event.result);
+  } else if (event.item.id == "snow") {
+    backgrounds['Snow'] = new createjs.Bitmap(event.result);
+  } else if (event.item.id == "grass") {
+    backgrounds['Grass'] = new createjs.Bitmap(event.result);
   }
 }
 
@@ -344,7 +408,9 @@ function loadComplete(event) {
 	createjs.Ticker.setFPS(FPS);
 	createjs.Ticker.addEventListener("tick", update); // call update function
 
-  stage.addChild(background);
+  stage.addChild(backgrounds['Ice']);
+  currentBackground = backgrounds['Ice'];
+  stage.addChild(overlay);
   stage.update();
   initGraphics();
 }
