@@ -33,8 +33,8 @@ var pushSelect, massSelect, surfaceSelect, positionSelect;
 // values for options
 var pushOptionValues = [];
 pushOptionValues['Small'] = 200;
-pushOptionValues['Medium'] = 350;
-pushOptionValues['Large'] = 445;
+pushOptionValues['Medium'] = 275;
+pushOptionValues['Large'] = 350;
 
 var massOptionValues = [];
 massOptionValues['Small'] = 20;
@@ -112,7 +112,7 @@ function initGraphics() {
 
   // bobsled
   bobsled.x = 10;
-  bobsled.y = 345;
+  bobsled.y = 380;
   stage.addChild(bobsled);
 
   // OVERLAYED SELECT BOXES
@@ -297,7 +297,7 @@ function reset() {
 
   // reset bobsled position
   bobsled.x = 10;
-  bobsled.y = 345;
+  bobsled.y = 380;
 
   // add the go button to the stage
   stage.addChild(go_button);
