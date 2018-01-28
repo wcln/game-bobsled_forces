@@ -54,6 +54,9 @@ positionOptionValues['Stand'] = 0.06;
 
 var currentBackground;
 
+// Chrome 1+
+var isChrome = !!window.chrome && !!window.chrome.webstore;
+
 
 
 function init() {
@@ -194,17 +197,22 @@ function initGraphics() {
  * Maintain positions of select HTML elements when page is zoomed or canvas is moved
  */
 function updateSelectPositions() {
+  let selectY = 473; // works well on firefox
+  if (isChrome) {
+    selectY = 478;
+  }
+
   pushSelect.x = gameCanvas.getBoundingClientRect().left + 65;
-  pushSelect.y = gameCanvas.getBoundingClientRect().top + 473;
+  pushSelect.y = gameCanvas.getBoundingClientRect().top + selectY;
 
   massSelect.x = gameCanvas.getBoundingClientRect().left + 212;
-  massSelect.y = gameCanvas.getBoundingClientRect().top + 473;
+  massSelect.y = gameCanvas.getBoundingClientRect().top + selectY;
 
   surfaceSelect.x = gameCanvas.getBoundingClientRect().left + 359;
-  surfaceSelect.y = gameCanvas.getBoundingClientRect().top + 473;
+  surfaceSelect.y = gameCanvas.getBoundingClientRect().top + selectY;
 
   positionSelect.x = gameCanvas.getBoundingClientRect().left + 506;
-  positionSelect.y = gameCanvas.getBoundingClientRect().top + 473;
+  positionSelect.y = gameCanvas.getBoundingClientRect().top + selectY;
 }
 
 function initListeners() {
