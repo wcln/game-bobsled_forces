@@ -92,6 +92,7 @@ function update(event) {
       } else {
         // update sled x position
         bobsled.x += displacement - last_displacement;
+        updateBobsledDudes();
 
         last_displacement = displacement;
       }
@@ -109,10 +110,34 @@ function endGame() {
 function initGraphics() {
 
   initMuteUnMuteButtons();
+  // push guy
+  var pushguyData = {
+    images: ["images/pushguy_sprite.png"],
+    frames: {width: 50, height: 65, count: 3, regX:0, regY: 0, spacing: 0, margin: 0},
+    animations: {
+      normal: 0,
+      push: [0, 2, false]
+    }
+  }
+  pushguy = new createjs.Sprite(new createjs.SpriteSheet(pushguyData));
+  pushguy.x = 0;
+  pushguy.y = 370;
+  pushguy.gotoAndPlay("normal");
+  stage.addChild(pushguy);
+
+
 
   // bobsled
-  bobsled.x = 10;
-  bobsled.y = 380;
+  bobsled.x = 20;
+  bobsled.y = 360;
+
+
+  // bobsled dude(s)
+  for (var i = 0; i < 3; i++) {
+    stage.addChild(bobsled_dudes[i]);
+  }
+  updateBobsledDudes();
+
   stage.addChild(bobsled);
 
   // OVERLAYED SELECT BOXES
@@ -179,13 +204,13 @@ function initGraphics() {
 	initListeners();
 
   // add go button
-  go_button.x = 100;
-  go_button.y = 200;
+  go_button.x = go_button_hover.x = 50;
+  go_button.y = go_button_hover.y = 200;
   stage.addChild(go_button);
 
   // reset button
-  reset_button.x = 400;
-  reset_button.y = 200;
+  reset_button.x = reset_button_hover.x = STAGE_WIDTH - 50 - reset_button.image.width;
+  reset_button.y = reset_button_hover.y = 200;
 
 
   // start the game
@@ -217,10 +242,33 @@ function updateSelectPositions() {
 
 function initListeners() {
   // go button
-  go_button.on("click", go);
+  go_button_hover.on("click", go);
+  go_button.on("rollover", function() {
+    stage.addChild(go_button_hover);
+    stage.removeChild(go_button);
+  });
+  go_button_hover.on("rollout", function() {
+    stage.addChild(go_button);
+    stage.removeChild(go_button_hover);
+  });
 
   // reset button
-  reset_button.on("click", reset);
+  reset_button_hover.on("click", reset);
+  reset_button.on("rollover", function() {
+    stage.addChild(reset_button_hover);
+    stage.removeChild(reset_button);
+  });
+  reset_button_hover.on("rollout", function() {
+    stage.addChild(reset_button);
+    stage.removeChild(reset_button_hover);
+  });
+}
+
+function updateBobsledDudes() {
+  for (var i = 0; i < 3; i++) {
+    bobsled_dudes[i].x = (bobsled.x + 12) + 22 * i;
+    bobsled_dudes[i].y = bobsled.y + 10;
+  }
 }
 
 /*
@@ -261,10 +309,21 @@ function updateSurface() {
   currentBackground = backgrounds[surfaceSelect.htmlElement.value];
 }
 
+function updateMass() {
+  // TODO
+}
+
+function updatePosition() {
+  // TODO
+}
+
 /*
  * Launch the bobsled!
  */
 function go() {
+
+  // remove the go button from the stage
+  stage.removeChild(go_button_hover);
 
   // set physics variables
   force_push = pushOptionValues[pushSelect.htmlElement.value];
@@ -277,10 +336,13 @@ function go() {
 
   start_time = new Date().getTime() / 1000; // start time in seconds
 
-  // remove the go button from the stage
-  stage.removeChild(go_button);
+
 
   last_displacement = 0;
+
+  // push guy animation
+  createjs.Tween.get(pushguy).call(function(){pushguy.gotoAndPlay("push")}).wait(700).call(function(){pushguy.gotoAndPlay("normal");});
+
 
   moving = true; // update method will run movement code now
 }
@@ -293,11 +355,13 @@ function reset() {
   moving = false;
 
   // remove reset button from Stage
-  stage.removeChild(reset_button);
+  stage.removeChild(reset_button_hover);
 
   // reset bobsled position
-  bobsled.x = 10;
-  bobsled.y = 380;
+  bobsled.x = 20;
+  bobsled.y = 360;
+
+  updateBobsledDudes();
 
   // add the go button to the stage
   stage.addChild(go_button);
@@ -310,9 +374,11 @@ function reset() {
 var muteButton, unmuteButton;
 var background;
 var bobsled;
-var go_button, reset_button;
+var go_button, reset_button, go_button_hover, reset_button_hover;
 var overlay;
 var backgrounds = [];
+var pushguy;
+var bobsled_dudes = [];
 
 
 function setupManifest() {
@@ -354,8 +420,20 @@ function setupManifest() {
       id: "go_button"
     },
     {
+      src: "images/go_button_hover.png",
+      id: "go_button_hover"
+    },
+    {
       src: "images/reset_button.png",
       id: "reset_button"
+    },
+    {
+      src: "images/reset_button_hover.png",
+      id: "reset_button_hover"
+    },
+    {
+      src: "images/bobsled_dude.png",
+      id: "bobsled_dude"
     }
  	];
 }
@@ -382,8 +460,12 @@ function handleFileLoad(event) {
     bobsled = new createjs.Bitmap(event.result);
   } else if (event.item.id == "go_button") {
     go_button = new createjs.Bitmap(event.result);
+  } else if (event.item.id == "go_button_hover") {
+    go_button_hover = new createjs.Bitmap(event.result);
   } else if (event.item.id == "reset_button") {
     reset_button = new createjs.Bitmap(event.result);
+  } else if (event.item.id == "reset_button_hover") {
+    reset_button_hover = new createjs.Bitmap(event.result);
   } else if (event.item.id == "overlay") {
     overlay = new createjs.Bitmap(event.result);
   } else if (event.item.id == "asphalt") {
@@ -394,6 +476,12 @@ function handleFileLoad(event) {
     backgrounds['Snow'] = new createjs.Bitmap(event.result);
   } else if (event.item.id == "grass") {
     backgrounds['Grass'] = new createjs.Bitmap(event.result);
+  } else if (event.item.id == "bobsled_dude") {
+    let temp = new createjs.Bitmap(event.result);
+
+    for (var i = 0; i < 3; i++) {
+      bobsled_dudes[i] = Object.create(temp);
+    }
   }
 }
 
