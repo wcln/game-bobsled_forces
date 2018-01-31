@@ -42,17 +42,21 @@ massOptionValues['Medium'] = 24;
 massOptionValues['Large'] = 27;
 
 var surfaceOptionValues = [];
-surfaceOptionValues['Ice'] = 0.02;
+surfaceOptionValues['Ice'] = 0.03;
 surfaceOptionValues['Snow'] = 0.06;
 surfaceOptionValues['Grass'] = 0.08;
-surfaceOptionValues['Asphalt'] = 0.10;
+surfaceOptionValues['Asphalt'] = 0.12;
 
 var positionOptionValues = [];
-positionOptionValues['Low'] = 0.02;
-positionOptionValues['Sit'] = 0.04;
-positionOptionValues['Stand'] = 0.06;
+positionOptionValues['Low'] = 0.008;
+positionOptionValues['Sit'] = 0.012;
+positionOptionValues['Stand'] = 0.02;
 
 var currentBackground;
+
+var position_y = 6; // position of bobsled dudes in bobsled
+
+var scoreText;
 
 // Chrome 1+
 var isChrome = !!window.chrome && !!window.chrome.webstore;
@@ -88,6 +92,7 @@ function update(event) {
 
       if (displacement - last_displacement < 0) {
         moving = false;
+        showScore();
         stage.addChild(reset_button);
       } else {
         // update sled x position
@@ -165,6 +170,8 @@ function initGraphics() {
   massSelectHTML.style.top = 0;
   massSelectHTML.style.left = 0;
   massSelectHTML.style.width = "70px";
+  massSelectHTML.onchange = updateMass;
+  massSelectHTML.value = "Large";
   document.body.appendChild(massSelectHTML);
   massSelect = new createjs.DOMElement(massSelectHTML);
 
@@ -179,6 +186,7 @@ function initGraphics() {
   surfaceSelectHTML.style.left = 0;
   surfaceSelectHTML.style.width = "70px";
   surfaceSelectHTML.onchange = updateSurface;
+  surfaceSelectHTML.value = "Asphalt";
   document.body.appendChild(surfaceSelectHTML);
   surfaceSelect = new createjs.DOMElement(surfaceSelectHTML);
 
@@ -192,6 +200,8 @@ function initGraphics() {
   positionSelectHTML.style.top = 0;
   positionSelectHTML.style.left = 0;
   positionSelectHTML.style.width = "70px";
+  positionSelectHTML.onchange = updatePosition;
+  positionSelectHTML.value = "Sit";
   document.body.appendChild(positionSelectHTML);
   positionSelect = new createjs.DOMElement(positionSelectHTML);
 
@@ -201,17 +211,22 @@ function initGraphics() {
   stage.addChild(surfaceSelect);
   stage.addChild(positionSelect);
 
+  updateMass();
+  updateSurface();
+  updatePosition();
+
 	initListeners();
 
   // add go button
-  go_button.x = go_button_hover.x = 50;
+  go_button.x = go_button_hover.x = STAGE_WIDTH/2 - go_button.image.width/2;
   go_button.y = go_button_hover.y = 200;
+  go_button_hover.cursor = "pointer";
   stage.addChild(go_button);
 
   // reset button
-  reset_button.x = reset_button_hover.x = STAGE_WIDTH - 50 - reset_button.image.width;
+  reset_button.x = reset_button_hover.x = STAGE_WIDTH/2 - reset_button.image.width/2;
   reset_button.y = reset_button_hover.y = 200;
-
+  reset_button_hover.cursor = "pointer";
 
   // start the game
 	gameStarted = true;
@@ -242,23 +257,25 @@ function updateSelectPositions() {
 
 function initListeners() {
   // go button
-  go_button_hover.on("click", go);
-  go_button.on("rollover", function() {
+  go_button_hover.on("mousedown", go);
+  go_button.on("mouseover", function() {
     stage.addChild(go_button_hover);
     stage.removeChild(go_button);
   });
-  go_button_hover.on("rollout", function() {
-    stage.addChild(go_button);
-    stage.removeChild(go_button_hover);
+  go_button_hover.on("mouseout", function() {
+    if (!moving) {
+      stage.addChild(go_button);
+      stage.removeChild(go_button_hover);
+    }
   });
 
   // reset button
-  reset_button_hover.on("click", reset);
-  reset_button.on("rollover", function() {
+  reset_button_hover.on("mousedown", reset);
+  reset_button.on("mouseover", function() {
     stage.addChild(reset_button_hover);
     stage.removeChild(reset_button);
   });
-  reset_button_hover.on("rollout", function() {
+  reset_button_hover.on("mouseout", function() {
     stage.addChild(reset_button);
     stage.removeChild(reset_button_hover);
   });
@@ -267,7 +284,7 @@ function initListeners() {
 function updateBobsledDudes() {
   for (var i = 0; i < 3; i++) {
     bobsled_dudes[i].x = (bobsled.x + 12) + 22 * i;
-    bobsled_dudes[i].y = bobsled.y + 10;
+    bobsled_dudes[i].y = bobsled.y + position_y;
   }
 }
 
@@ -310,17 +327,39 @@ function updateSurface() {
 }
 
 function updateMass() {
-  // TODO
+  if (massSelect.htmlElement.value == "Small") {
+    stage.removeChild(bobsled_dudes[0]);
+    stage.removeChild(bobsled_dudes[1]);
+    stage.addChildAt(bobsled_dudes[2], stage.getChildIndex(bobsled) - 1);
+  } else if (massSelect.htmlElement.value == "Medium") {
+    stage.removeChild(bobsled_dudes[0]);
+    stage.addChildAt(bobsled_dudes[1], stage.getChildIndex(bobsled) - 1);
+    stage.addChildAt(bobsled_dudes[2], stage.getChildIndex(bobsled) - 1);
+  } else if (massSelect.htmlElement.value == "Large") {
+    stage.addChildAt(bobsled_dudes[0], stage.getChildIndex(bobsled) - 1);
+    stage.addChildAt(bobsled_dudes[1], stage.getChildIndex(bobsled) - 1);
+    stage.addChildAt(bobsled_dudes[2], stage.getChildIndex(bobsled) - 1);
+  }
 }
 
 function updatePosition() {
-  // TODO
+  if (positionSelect.htmlElement.value == "Low") {
+    position_y = 13;
+  } else if (positionSelect.htmlElement.value == "Sit") {
+    position_y = 6;
+  } else if (positionSelect.htmlElement.value == "Stand") {
+    position_y = 0;
+  }
+  updateBobsledDudes();
 }
 
 /*
  * Launch the bobsled!
  */
 function go() {
+
+  // ensure reset button is removed
+  stage.removeChild(reset_button);
 
   // remove the go button from the stage
   stage.removeChild(go_button_hover);
@@ -355,7 +394,11 @@ function reset() {
   moving = false;
 
   // remove reset button from Stage
+  stage.removeChild(reset_button);
   stage.removeChild(reset_button_hover);
+
+  // remove score Text
+  stage.removeChild(scoreText);
 
   // reset bobsled position
   bobsled.x = 20;
@@ -365,6 +408,13 @@ function reset() {
 
   // add the go button to the stage
   stage.addChild(go_button);
+}
+
+function showScore() {
+  scoreText = new createjs.Text("You made it " + (bobsled.x/10).toFixed(1) + " meters!", '30px Lato', 'black');
+  scoreText.x = STAGE_WIDTH/2 - scoreText.getMeasuredWidth()/2;
+  scoreText.y = 185;
+  stage.addChild(scoreText);
 }
 
 
