@@ -357,6 +357,7 @@ function updatePosition() {
  * Launch the bobsled!
  */
 function go() {
+  playSound("click");
 
   // ensure reset button is removed
   stage.removeChild(reset_button);
@@ -390,6 +391,8 @@ function go() {
  * Reset the bobsled for another push
  */
 function reset() {
+  playSound("click");
+
   // ensure that moving is set to false (should be anyways)
   moving = false;
 
@@ -433,6 +436,10 @@ var bobsled_dudes = [];
 
 function setupManifest() {
  	manifest = [
+    {
+      src: "sounds/click.mp3",
+      id: "click"
+    },
     {
       src: "images/mute.png",
       id: "mute"
