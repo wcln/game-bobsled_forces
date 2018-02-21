@@ -358,7 +358,7 @@ function updatePosition() {
  */
 function go() {
   // disable selects
-  heightSelect.htmlElement.disabled = true;
+  pushSelect.htmlElement.disabled = true;
   massSelect.htmlElement.disabled = true;
   surfaceSelect.htmlElement.disabled = true;
   positionSelect.htmlElement.disabled = true;
@@ -398,7 +398,7 @@ function go() {
  */
 function reset() {
   // enable selects
-  heightSelect.htmlElement.disabled = false;
+  pushSelect.htmlElement.disabled = false;
   massSelect.htmlElement.disabled = false;
   surfaceSelect.htmlElement.disabled = false;
   positionSelect.htmlElement.disabled = false;
