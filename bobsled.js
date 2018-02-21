@@ -239,7 +239,7 @@ function initGraphics() {
 function updateSelectPositions() {
   let selectY = 473; // works well on firefox
   if (isChrome) {
-    selectY = 478;
+    selectY = 480;
   }
 
   pushSelect.x = gameCanvas.getBoundingClientRect().left + 65;
@@ -357,6 +357,12 @@ function updatePosition() {
  * Launch the bobsled!
  */
 function go() {
+  // disable selects
+  heightSelect.htmlElement.disabled = true;
+  massSelect.htmlElement.disabled = true;
+  surfaceSelect.htmlElement.disabled = true;
+  positionSelect.htmlElement.disabled = true;
+
   playSound("click");
 
   // ensure reset button is removed
@@ -391,6 +397,11 @@ function go() {
  * Reset the bobsled for another push
  */
 function reset() {
+  // enable selects
+  heightSelect.htmlElement.disabled = false;
+  massSelect.htmlElement.disabled = false;
+  surfaceSelect.htmlElement.disabled = false;
+  positionSelect.htmlElement.disabled = false;
   playSound("click");
 
   // ensure that moving is set to false (should be anyways)
